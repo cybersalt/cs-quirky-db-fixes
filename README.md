@@ -1,6 +1,6 @@
 # CS Quirky DB Fixes
 
-A Joomla 5/6 component that provides fixes for quirky database problems that occur from time to time, particularly after migrations from Joomla 3 to Joomla 4/5.
+A Joomla 5/6 component that provides fixes for quirky database problems that occur from time to time, particularly after migrations from Joomla 3 to Joomla 4.
 
 ## Features
 
@@ -12,7 +12,7 @@ A Joomla 5/6 component that provides fixes for quirky database problems that occ
 ## Included Fixes
 
 ### 1. Fix Missing Default Workflow
-**Problem**: After migrating from Joomla 3 to Joomla 4/5, NO articles appear in the Article Manager.
+**Problem**: After migrating from Joomla 3 to Joomla 4, NO articles appear in the Article Manager.
 
 **Cause**: The default workflow record is missing from the `#__workflows` table.
 
@@ -21,7 +21,7 @@ A Joomla 5/6 component that provides fixes for quirky database problems that occ
 *Fix by: [Brian Teeman](https://brian.teeman.net/)*
 
 ### 2. Fix Missing Workflow Associations
-**Problem**: After migrating from Joomla 3 to Joomla 4/5, SOME or ALL articles don't appear in the Article Manager.
+**Problem**: After migrating from Joomla 3 to Joomla 4, SOME or ALL articles don't appear in the Article Manager.
 
 **Cause**: Articles lack entries in the `#__workflow_associations` table.
 
