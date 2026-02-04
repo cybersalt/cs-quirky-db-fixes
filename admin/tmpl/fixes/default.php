@@ -141,7 +141,7 @@ use Joomla\CMS\Router\Route;
                                     <a href="<?php echo $this->escape($fix['reference']); ?>"
                                        target="_blank"
                                        rel="noopener noreferrer"
-                                       class="btn btn-outline-secondary btn-sm">
+                                       class="btn btn-secondary btn-sm">
                                         <span class="icon-external-link" aria-hidden="true"></span>
                                         <?php echo Text::_('COM_CSQUIRKYDBFIXES_MORE_INFO'); ?>
                                     </a>
@@ -156,7 +156,7 @@ use Joomla\CMS\Router\Route;
                                     <input type="hidden" name="task" value="fixes.backup">
                                     <input type="hidden" name="fix_id" value="<?php echo $this->escape($fixId); ?>">
                                     <?php echo HTMLHelper::_('form.token'); ?>
-                                    <button type="submit" class="btn btn-outline-primary">
+                                    <button type="submit" class="btn btn-primary">
                                         <span class="icon-download" aria-hidden="true"></span>
                                         <?php echo Text::_('COM_CSQUIRKYDBFIXES_DOWNLOAD_BACKUP'); ?>
                                     </button>
