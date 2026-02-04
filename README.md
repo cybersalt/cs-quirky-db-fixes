@@ -36,7 +36,7 @@ A Joomla 5/6 component that provides fixes for quirky database problems that occ
 
 **Solution**: Recreates the missing submenu items under Components > Smart Search.
 
-*Fix by: Tim Davis*
+*Fix by: [Tim Davis](https://cybersalt.com/)*
 
 ## Installation
 

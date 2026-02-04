@@ -76,7 +76,7 @@ class FixesModel extends BaseDatabaseModel
                 'description'     => Text::_('COM_CSQUIRKYDBFIXES_FIX_SMART_SEARCH_MENU_DESC'),
                 'category'        => Text::_('COM_CSQUIRKYDBFIXES_CATEGORY_MAINTENANCE'),
                 'author'          => 'Tim Davis',
-                'author_url'      => '',
+                'author_url'      => 'https://cybersalt.com/',
                 'reference'       => '',
                 'diagnostic_key'  => 'COM_CSQUIRKYDBFIXES_SMART_SEARCH_MENU_MISSING',
                 'sql_code'        => "-- This fix dynamically:\n"
