@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <fieldset name="component" label="COM_CSQUIRKYDBFIXES">
+        <field
+            name="info"
+            type="note"
+            label="COM_CSQUIRKYDBFIXES_INFO_HEADING"
+            description="COM_CSQUIRKYDBFIXES_CONFIG_NO_OPTIONS"
+        />
+    </fieldset>
+</config>

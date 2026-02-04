@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="5.0" method="upgrade">
+    <name>COM_CSQUIRKYDBFIXES</name>
+    <author>Cybersalt</author>
+    <creationDate>2026-02</creationDate>
+    <copyright>Copyright (C) 2026 Cybersalt Consulting Ltd. All rights reserved.</copyright>
+    <license>GNU General Public License version 2 or later</license>
+    <authorEmail>support@cybersalt.com</authorEmail>
+    <authorUrl>https://cybersalt.com</authorUrl>
+    <version>1.0.0</version>
+    <description>COM_CSQUIRKYDBFIXES_XML_DESCRIPTION</description>
+    <changelogurl>https://raw.githubusercontent.com/cybersalt/cs-quirky-db-fixes/main/CHANGELOG.html</changelogurl>
+
+    <namespace path="src">Cybersalt\Component\CsQuirkyDbFixes</namespace>
+
+    <scriptfile>script.php</scriptfile>
+
+    <administration>
+        <menu img="class:wrench">COM_CSQUIRKYDBFIXES</menu>
+
+        <files folder="admin">
+            <filename>config.xml</filename>
+            <folder>services</folder>
+            <folder>src</folder>
+            <folder>tmpl</folder>
+        </files>
+
+        <languages folder="admin/language">
+            <language tag="en-GB">en-GB/com_csquirkydbfixes.ini</language>
+            <language tag="en-GB">en-GB/com_csquirkydbfixes.sys.ini</language>
+        </languages>
+    </administration>
+</extension>
