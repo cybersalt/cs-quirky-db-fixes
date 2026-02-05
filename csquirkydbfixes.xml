@@ -19,6 +19,7 @@
         <menu img="class:wrench">COM_CSQUIRKYDBFIXES</menu>
 
         <files folder="admin">
+            <filename>access.xml</filename>
             <filename>config.xml</filename>
             <folder>services</folder>
             <folder>src</folder>
