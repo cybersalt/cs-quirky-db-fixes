@@ -622,6 +622,34 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
+     * Get list of disabled workflow plugins
+     *
+     * If core workflow plugins are disabled, new articles won't get workflow
+     * associations, causing the same "missing associations" problem to recur
+     * after it has been fixed.
+     *
+     * @return  array  Array of disabled plugin names (empty if all are enabled)
+     *
+     * @since   1.0.0
+     */
+    public function getDisabledWorkflowPlugins(): array
+    {
+        $db = $this->getDatabase();
+
+        $query = $db->getQuery(true)
+            ->select([$db->quoteName('name'), $db->quoteName('element')])
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+            ->where($db->quoteName('folder') . ' = ' . $db->quote('workflow'))
+            ->where($db->quoteName('enabled') . ' = 0');
+
+        $db->setQuery($query);
+        $results = $db->loadAssocList();
+
+        return $results ?: [];
+    }
+
+    /**
      * Get diagnostics for all fixes
      *
      * @return  array  Array of fix IDs to diagnostic info
@@ -636,8 +664,9 @@ class FixesModel extends BaseDatabaseModel
                 'missing_count' => null,
             ],
             'workflow_associations' => [
-                'is_missing'    => false,
-                'missing_count' => $this->getMissingWorkflowAssociationsCount(),
+                'is_missing'            => false,
+                'missing_count'         => $this->getMissingWorkflowAssociationsCount(),
+                'disabled_plugins'      => $this->getDisabledWorkflowPlugins(),
             ],
             'smart_search_menu' => [
                 'is_missing'    => false,

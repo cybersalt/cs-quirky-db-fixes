@@ -116,6 +116,19 @@ use Joomla\CMS\Router\Route;
                                         <?php echo Text::_('COM_CSQUIRKYDBFIXES_NO_ISSUES_FOUND'); ?>
                                     </div>
                                 <?php endif; ?>
+                                <?php
+                                $disabledPlugins = $diagnostic['disabled_plugins'] ?? [];
+                                if (!empty($disabledPlugins)) :
+                                    $pluginNames = array_map(function ($p) { return Text::_($p['name']); }, $disabledPlugins);
+                                ?>
+                                    <div class="alert alert-danger">
+                                        <h6 class="alert-heading">
+                                            <span class="icon-notification-circle" aria-hidden="true"></span>
+                                            <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED_HEADING'); ?>
+                                        </h6>
+                                        <?php echo Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED', implode(', ', $pluginNames)); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
 
                             <!-- SQL Code -->
