@@ -689,6 +689,92 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
+     * Enable workflows in the com_content component configuration
+     *
+     * Sets the workflow_enabled parameter to "1" in com_content's params JSON.
+     *
+     * @return  array  Result array with 'success' and 'message' keys
+     *
+     * @since   1.0.0
+     */
+    public function enableWorkflows(): array
+    {
+        $db = $this->getDatabase();
+
+        try {
+            // Get current params
+            $query = $db->getQuery(true)
+                ->select($db->quoteName('params'))
+                ->from($db->quoteName('#__extensions'))
+                ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
+                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+
+            $db->setQuery($query);
+            $paramsJson = $db->loadResult();
+
+            $params = $paramsJson ? json_decode($paramsJson, true) : [];
+            $params['workflow_enabled'] = '1';
+
+            $query = $db->getQuery(true)
+                ->update($db->quoteName('#__extensions'))
+                ->set($db->quoteName('params') . ' = ' . $db->quote(json_encode($params)))
+                ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
+                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+
+            $db->setQuery($query);
+            $db->execute();
+
+            return [
+                'success' => true,
+                'message' => Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_ENABLED_SUCCESS'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Enable all disabled workflow plugins
+     *
+     * @return  array  Result array with 'success', 'affected_rows', and 'message' keys
+     *
+     * @since   1.0.0
+     */
+    public function enableWorkflowPlugins(): array
+    {
+        $db = $this->getDatabase();
+
+        try {
+            $query = $db->getQuery(true)
+                ->update($db->quoteName('#__extensions'))
+                ->set($db->quoteName('enabled') . ' = 1')
+                ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+                ->where($db->quoteName('folder') . ' = ' . $db->quote('workflow'))
+                ->where($db->quoteName('enabled') . ' = 0');
+
+            $db->setQuery($query);
+            $db->execute();
+
+            $affectedRows = $db->getAffectedRows();
+
+            return [
+                'success'       => true,
+                'affected_rows' => $affectedRows,
+                'message'       => Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_ENABLED_SUCCESS', $affectedRows),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success'       => false,
+                'affected_rows' => 0,
+                'message'       => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Get diagnostics for all fixes
      *
      * @return  array  Array of fix IDs to diagnostic info

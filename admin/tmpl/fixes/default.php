@@ -125,7 +125,15 @@ use Joomla\CMS\Router\Route;
                                             <span class="icon-notification-circle" aria-hidden="true"></span>
                                             <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_HEADING'); ?>
                                         </h6>
-                                        <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED'); ?>
+                                        <p class="mb-2"><?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED'); ?></p>
+                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline">
+                                            <input type="hidden" name="task" value="fixes.enableworkflows">
+                                            <?php echo HTMLHelper::_('form.token'); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <span class="icon-play" aria-hidden="true"></span>
+                                                <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_FIX_BUTTON'); ?>
+                                            </button>
+                                        </form>
                                     </div>
                                 <?php endif; ?>
                                 <?php
@@ -138,7 +146,15 @@ use Joomla\CMS\Router\Route;
                                             <span class="icon-notification-circle" aria-hidden="true"></span>
                                             <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED_HEADING'); ?>
                                         </h6>
-                                        <?php echo Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED', implode(', ', $pluginNames)); ?>
+                                        <p class="mb-2"><?php echo Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED', implode(', ', $pluginNames)); ?></p>
+                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline">
+                                            <input type="hidden" name="task" value="fixes.enableworkflowplugins">
+                                            <?php echo HTMLHelper::_('form.token'); ?>
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <span class="icon-play" aria-hidden="true"></span>
+                                                <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_ENABLE_BUTTON'); ?>
+                                            </button>
+                                        </form>
                                     </div>
                                 <?php endif; ?>
                             </div>
