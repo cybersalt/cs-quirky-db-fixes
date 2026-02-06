@@ -92,6 +92,54 @@ class FixesModel extends BaseDatabaseModel
                     . "  (nextId+2, 'main', 'com_finder_filters', ...),\n"
                     . "  (nextId+3, 'main', 'com_finder_searches', ...);",
             ],
+            'finder_tokens' => [
+                'id'              => 'finder_tokens',
+                'name'            => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_NAME'),
+                'description'     => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_DESC'),
+                'category'        => Text::_('COM_CSQUIRKYDBFIXES_CATEGORY_MAINTENANCE'),
+                'author'          => 'Tim Davis',
+                'author_url'      => 'https://cybersalt.com/',
+                'reference'       => '',
+                'diagnostic_key'  => 'COM_CSQUIRKYDBFIXES_FINDER_TOKENS_MISSING',
+                'sql_code'        => "CREATE TABLE IF NOT EXISTS `#__finder_tokens` (\n"
+                    . "  `term` varchar(75) NOT NULL,\n"
+                    . "  `stem` varchar(75) NOT NULL DEFAULT '',\n"
+                    . "  `common` tinyint unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `phrase` tinyint unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `weight` float unsigned NOT NULL DEFAULT 1,\n"
+                    . "  `context` tinyint unsigned NOT NULL DEFAULT 2,\n"
+                    . "  `language` char(7) NOT NULL DEFAULT '',\n"
+                    . "  KEY `idx_word` (`term`),\n"
+                    . "  KEY `idx_stem` (`stem`),\n"
+                    . "  KEY `idx_context` (`context`)\n"
+                    . ") ENGINE=MEMORY DEFAULT CHARSET=utf8mb4\n"
+                    . "  DEFAULT COLLATE=utf8mb4_general_ci;",
+            ],
+            'finder_tokens_aggregate' => [
+                'id'              => 'finder_tokens_aggregate',
+                'name'            => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_AGG_NAME'),
+                'description'     => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_AGG_DESC'),
+                'category'        => Text::_('COM_CSQUIRKYDBFIXES_CATEGORY_MAINTENANCE'),
+                'author'          => 'Tim Davis',
+                'author_url'      => 'https://cybersalt.com/',
+                'reference'       => '',
+                'diagnostic_key'  => 'COM_CSQUIRKYDBFIXES_FINDER_TOKENS_AGG_MISSING',
+                'sql_code'        => "CREATE TABLE IF NOT EXISTS `#__finder_tokens_aggregate` (\n"
+                    . "  `term_id` int unsigned NOT NULL,\n"
+                    . "  `term` varchar(75) NOT NULL,\n"
+                    . "  `stem` varchar(75) NOT NULL DEFAULT '',\n"
+                    . "  `common` tinyint unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `phrase` tinyint unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `term_weight` float unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `context` tinyint unsigned NOT NULL DEFAULT 2,\n"
+                    . "  `context_weight` float unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `total_weight` float unsigned NOT NULL DEFAULT 0,\n"
+                    . "  `language` char(7) NOT NULL DEFAULT '',\n"
+                    . "  KEY `idx_term` (`term`),\n"
+                    . "  KEY `idx_stem` (`stem`)\n"
+                    . ") ENGINE=MEMORY DEFAULT CHARSET=utf8mb4\n"
+                    . "  DEFAULT COLLATE=utf8mb4_general_ci;",
+            ],
         ];
     }
 
@@ -506,6 +554,130 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
+     * Check if the finder_tokens MEMORY table exists
+     *
+     * @return  bool  True if the table is missing
+     *
+     * @since   1.0.0
+     */
+    public function isFinderTokensMissing(): bool
+    {
+        $db = $this->getDatabase();
+        $tableName = str_replace('#__', $db->getPrefix(), '#__finder_tokens');
+
+        $db->setQuery("SHOW TABLES LIKE " . $db->quote($tableName));
+        $result = $db->loadResult();
+
+        return empty($result);
+    }
+
+    /**
+     * Check if the finder_tokens_aggregate MEMORY table exists
+     *
+     * @return  bool  True if the table is missing
+     *
+     * @since   1.0.0
+     */
+    public function isFinderTokensAggregateMissing(): bool
+    {
+        $db = $this->getDatabase();
+        $tableName = str_replace('#__', $db->getPrefix(), '#__finder_tokens_aggregate');
+
+        $db->setQuery("SHOW TABLES LIKE " . $db->quote($tableName));
+        $result = $db->loadResult();
+
+        return empty($result);
+    }
+
+    /**
+     * Fix missing finder_tokens MEMORY table
+     *
+     * @return  array  Result array
+     *
+     * @since   1.0.0
+     */
+    protected function fixFinderTokens(): array
+    {
+        $db = $this->getDatabase();
+        $prefix = $db->getPrefix();
+
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "finder_tokens` (
+                `term` varchar(75) NOT NULL,
+                `stem` varchar(75) NOT NULL DEFAULT '',
+                `common` tinyint unsigned NOT NULL DEFAULT 0,
+                `phrase` tinyint unsigned NOT NULL DEFAULT 0,
+                `weight` float unsigned NOT NULL DEFAULT 1,
+                `context` tinyint unsigned NOT NULL DEFAULT 2,
+                `language` char(7) NOT NULL DEFAULT '',
+                KEY `idx_word` (`term`),
+                KEY `idx_stem` (`stem`),
+                KEY `idx_context` (`context`)
+            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci";
+
+            $db->setQuery($sql);
+            $db->execute();
+
+            return [
+                'success'       => true,
+                'affected_rows' => 1,
+                'message'       => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_RESULT'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success'       => false,
+                'affected_rows' => 0,
+                'message'       => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Fix missing finder_tokens_aggregate MEMORY table
+     *
+     * @return  array  Result array
+     *
+     * @since   1.0.0
+     */
+    protected function fixFinderTokensAggregate(): array
+    {
+        $db = $this->getDatabase();
+        $prefix = $db->getPrefix();
+
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "finder_tokens_aggregate` (
+                `term_id` int unsigned NOT NULL,
+                `term` varchar(75) NOT NULL,
+                `stem` varchar(75) NOT NULL DEFAULT '',
+                `common` tinyint unsigned NOT NULL DEFAULT 0,
+                `phrase` tinyint unsigned NOT NULL DEFAULT 0,
+                `term_weight` float unsigned NOT NULL DEFAULT 0,
+                `context` tinyint unsigned NOT NULL DEFAULT 2,
+                `context_weight` float unsigned NOT NULL DEFAULT 0,
+                `total_weight` float unsigned NOT NULL DEFAULT 0,
+                `language` char(7) NOT NULL DEFAULT '',
+                KEY `idx_term` (`term`),
+                KEY `idx_stem` (`stem`)
+            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci";
+
+            $db->setQuery($sql);
+            $db->execute();
+
+            return [
+                'success'       => true,
+                'affected_rows' => 1,
+                'message'       => Text::_('COM_CSQUIRKYDBFIXES_FIX_FINDER_TOKENS_AGG_RESULT'),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success'       => false,
+                'affected_rows' => 0,
+                'message'       => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Get a SQL backup of tables affected by a specific fix
      *
      * @param   string  $fixId  The fix identifier
@@ -518,9 +690,11 @@ class FixesModel extends BaseDatabaseModel
     {
         // Map fix IDs to their affected tables
         $tableMap = [
-            'missing_workflow'      => ['#__workflows', '#__workflow_stages', '#__workflow_transitions'],
-            'workflow_associations' => ['#__workflow_associations'],
-            'smart_search_menu'     => ['#__menu'],
+            'missing_workflow'         => ['#__workflows', '#__workflow_stages', '#__workflow_transitions'],
+            'workflow_associations'     => ['#__workflow_associations'],
+            'smart_search_menu'        => ['#__menu'],
+            'finder_tokens'            => ['#__finder_tokens'],
+            'finder_tokens_aggregate'  => ['#__finder_tokens_aggregate'],
         ];
 
         if (!isset($tableMap[$fixId])) {
@@ -797,6 +971,14 @@ class FixesModel extends BaseDatabaseModel
             'smart_search_menu' => [
                 'is_missing'    => false,
                 'missing_count' => $this->getMissingSmartSearchMenuCount(),
+            ],
+            'finder_tokens' => [
+                'is_missing'    => $this->isFinderTokensMissing(),
+                'missing_count' => null,
+            ],
+            'finder_tokens_aggregate' => [
+                'is_missing'    => $this->isFinderTokensAggregateMissing(),
+                'missing_count' => null,
             ],
         ];
     }
