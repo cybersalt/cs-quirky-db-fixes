@@ -117,6 +117,18 @@ use Joomla\CMS\Router\Route;
                                     </div>
                                 <?php endif; ?>
                                 <?php
+                                $workflowEnabled = $diagnostic['workflow_enabled'] ?? 'enabled';
+                                if ($workflowEnabled !== 'enabled') :
+                                ?>
+                                    <div class="alert alert-danger">
+                                        <h6 class="alert-heading">
+                                            <span class="icon-notification-circle" aria-hidden="true"></span>
+                                            <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_HEADING'); ?>
+                                        </h6>
+                                        <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED'); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php
                                 $disabledPlugins = $diagnostic['disabled_plugins'] ?? [];
                                 if (!empty($disabledPlugins)) :
                                     $pluginNames = array_map(function ($p) { return Text::_($p['name']); }, $disabledPlugins);

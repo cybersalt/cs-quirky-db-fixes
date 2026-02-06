@@ -622,6 +622,45 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
+     * Check if workflows are enabled in the com_content component configuration
+     *
+     * After migrating from Joomla 3 to Joomla 4, the workflow_enabled parameter
+     * may not be set in com_content's params. When not set or disabled, Joomla
+     * won't create workflow associations for new articles, but the article list
+     * query still joins to the workflow_associations table - causing new articles
+     * to be invisible in the Article Manager.
+     *
+     * @return  string  'enabled', 'disabled', or 'not_set'
+     *
+     * @since   1.0.0
+     */
+    public function getWorkflowEnabledStatus(): string
+    {
+        $db = $this->getDatabase();
+
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('params'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
+            ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
+
+        $db->setQuery($query);
+        $paramsJson = $db->loadResult();
+
+        if (!$paramsJson) {
+            return 'not_set';
+        }
+
+        $params = json_decode($paramsJson, true);
+
+        if (!isset($params['workflow_enabled'])) {
+            return 'not_set';
+        }
+
+        return $params['workflow_enabled'] === '1' ? 'enabled' : 'disabled';
+    }
+
+    /**
      * Get list of disabled workflow plugins
      *
      * If core workflow plugins are disabled, new articles won't get workflow
@@ -667,6 +706,7 @@ class FixesModel extends BaseDatabaseModel
                 'is_missing'            => false,
                 'missing_count'         => $this->getMissingWorkflowAssociationsCount(),
                 'disabled_plugins'      => $this->getDisabledWorkflowPlugins(),
+                'workflow_enabled'      => $this->getWorkflowEnabledStatus(),
             ],
             'smart_search_menu' => [
                 'is_missing'    => false,
