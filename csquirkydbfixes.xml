@@ -7,7 +7,7 @@
     <license>GNU General Public License version 2 or later</license>
     <authorEmail>support@cybersalt.com</authorEmail>
     <authorUrl>https://cybersalt.com</authorUrl>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <description>COM_CSQUIRKYDBFIXES_XML_DESCRIPTION</description>
     <changelogurl>https://raw.githubusercontent.com/cybersalt/cs-quirky-db-fixes/main/CHANGELOG.html</changelogurl>
 
@@ -20,6 +20,7 @@
 
         <files folder="admin">
             <filename>config.xml</filename>
+            <folder>language</folder>
             <folder>services</folder>
             <folder>src</folder>
             <folder>tmpl</folder>

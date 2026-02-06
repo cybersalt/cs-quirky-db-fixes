@@ -38,18 +38,19 @@ class FixesModel extends BaseDatabaseModel
                 'name'            => Text::_('COM_CSQUIRKYDBFIXES_FIX_MISSING_WORKFLOW_NAME'),
                 'description'     => Text::_('COM_CSQUIRKYDBFIXES_FIX_MISSING_WORKFLOW_DESC'),
                 'category'        => Text::_('COM_CSQUIRKYDBFIXES_CATEGORY_MIGRATION'),
-                'author'          => 'Brian Teeman',
+                'author'          => 'Brian Teeman / Tim Davis',
                 'author_url'      => 'https://forum.joomla.org/viewtopic.php?t=991923',
                 'reference'       => 'https://www.cybersalt.com/joomla-training-cohort/no-articles-appearing-in-the-article-manager-after-migrating-to-joomla-4',
-                'diagnostic_key'  => 'COM_CSQUIRKYDBFIXES_WORKFLOW_RECORD_MISSING',
-                'sql_code'        => "INSERT IGNORE INTO `#__workflows` \n"
-                    . "  (`id`, `asset_id`, `published`, `title`, `description`, \n"
-                    . "   `extension`, `default`, `ordering`, `created`, `created_by`, \n"
-                    . "   `modified`, `modified_by`, `checked_out_time`, `checked_out`) \n"
-                    . "VALUES \n"
-                    . "  (1, 0, 1, 'COM_WORKFLOW_BASIC_WORKFLOW', '', \n"
-                    . "   'com_content.article', 1, 1, CURRENT_TIMESTAMP(), 0, \n"
-                    . "   CURRENT_TIMESTAMP(), 0, NULL, NULL);",
+                'diagnostic_key'  => 'COM_CSQUIRKYDBFIXES_WORKFLOW_SYSTEM_MISSING',
+                'sql_code'        => "-- This fix checks and restores all 4 workflow tables:\n\n"
+                    . "-- 1. CREATE TABLE IF NOT EXISTS #__workflow_stages ...;\n"
+                    . "-- 2. CREATE TABLE IF NOT EXISTS #__workflow_transitions ...;\n"
+                    . "-- 3. CREATE TABLE IF NOT EXISTS #__workflow_associations ...;\n"
+                    . "-- 4. INSERT IGNORE INTO #__workflows (default workflow record);\n"
+                    . "-- 5. INSERT IGNORE INTO #__workflow_stages (default stage);\n"
+                    . "-- 6. INSERT IGNORE INTO #__workflow_transitions\n"
+                    . "--    (7 default transitions: Unpublish, Publish, Trash,\n"
+                    . "--     Archive, Feature, Unfeature, Publish & Feature);",
             ],
             'workflow_associations' => [
                 'id'              => 'workflow_associations',
@@ -113,7 +114,7 @@ class FixesModel extends BaseDatabaseModel
                     . "  KEY `idx_stem` (`stem`),\n"
                     . "  KEY `idx_context` (`context`)\n"
                     . ") ENGINE=MEMORY DEFAULT CHARSET=utf8mb4\n"
-                    . "  DEFAULT COLLATE=utf8mb4_general_ci;",
+                    . "  DEFAULT COLLATE={auto-detected from database};",
             ],
             'finder_tokens_aggregate' => [
                 'id'              => 'finder_tokens_aggregate',
@@ -138,7 +139,7 @@ class FixesModel extends BaseDatabaseModel
                     . "  KEY `idx_term` (`term`),\n"
                     . "  KEY `idx_stem` (`stem`)\n"
                     . ") ENGINE=MEMORY DEFAULT CHARSET=utf8mb4\n"
-                    . "  DEFAULT COLLATE=utf8mb4_general_ci;",
+                    . "  DEFAULT COLLATE={auto-detected from database};",
             ],
         ];
     }
@@ -179,11 +180,12 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
-     * Fix missing default workflow record for com_content.article
+     * Restore the complete workflow system for com_content.article
      *
-     * After migrating from Joomla 3 to Joomla 4/5, articles don't appear in the
-     * Article Manager because the default workflow record is missing from the
-     * #__workflows table.
+     * After migrating from Joomla 3 to Joomla 4/5, the workflow infrastructure
+     * may be partially or completely missing. This fix creates any missing tables
+     * (workflow_stages, workflow_transitions, workflow_associations) and inserts
+     * the default records needed for the workflow system to function.
      *
      * @return  array  Result array
      *
@@ -192,9 +194,87 @@ class FixesModel extends BaseDatabaseModel
     protected function fixMissingWorkflow(): array
     {
         $db = $this->getDatabase();
+        $prefix = $db->getPrefix();
+        $totalActions = 0;
+        $details = [];
 
         try {
-            // Use INSERT IGNORE to only insert if the record doesn't exist
+            // Step 1: Create workflow_stages table if missing
+            if ($this->isTableMissing('workflow_stages')) {
+                $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "workflow_stages` (
+                    `id` int NOT NULL AUTO_INCREMENT,
+                    `asset_id` int DEFAULT 0,
+                    `ordering` int NOT NULL DEFAULT 0,
+                    `workflow_id` int NOT NULL,
+                    `published` tinyint NOT NULL DEFAULT 0,
+                    `title` varchar(255) NOT NULL,
+                    `description` text NOT NULL,
+                    `default` tinyint NOT NULL DEFAULT 0,
+                    `checked_out_time` datetime DEFAULT NULL,
+                    `checked_out` int unsigned DEFAULT NULL,
+                    PRIMARY KEY (`id`),
+                    KEY `idx_workflow_id` (`workflow_id`),
+                    KEY `idx_checked_out` (`checked_out`),
+                    KEY `idx_title` (`title`(191)),
+                    KEY `idx_asset_id` (`asset_id`),
+                    KEY `idx_default` (`default`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci";
+
+                $db->setQuery($sql);
+                $db->execute();
+                $totalActions++;
+                $details[] = Text::_('COM_CSQUIRKYDBFIXES_DETAIL_CREATED_STAGES_TABLE');
+            }
+
+            // Step 2: Create workflow_transitions table if missing
+            if ($this->isTableMissing('workflow_transitions')) {
+                $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "workflow_transitions` (
+                    `id` int NOT NULL AUTO_INCREMENT,
+                    `asset_id` int DEFAULT 0,
+                    `ordering` int NOT NULL DEFAULT 0,
+                    `workflow_id` int NOT NULL,
+                    `published` tinyint NOT NULL DEFAULT 0,
+                    `title` varchar(255) NOT NULL,
+                    `description` text NOT NULL,
+                    `from_stage_id` int NOT NULL,
+                    `to_stage_id` int NOT NULL,
+                    `options` text NOT NULL,
+                    `checked_out_time` datetime DEFAULT NULL,
+                    `checked_out` int unsigned DEFAULT NULL,
+                    PRIMARY KEY (`id`),
+                    KEY `idx_title` (`title`(191)),
+                    KEY `idx_asset_id` (`asset_id`),
+                    KEY `idx_checked_out` (`checked_out`),
+                    KEY `idx_from_stage_id` (`from_stage_id`),
+                    KEY `idx_to_stage_id` (`to_stage_id`),
+                    KEY `idx_workflow_id` (`workflow_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci";
+
+                $db->setQuery($sql);
+                $db->execute();
+                $totalActions++;
+                $details[] = Text::_('COM_CSQUIRKYDBFIXES_DETAIL_CREATED_TRANSITIONS_TABLE');
+            }
+
+            // Step 3: Create workflow_associations table if missing
+            if ($this->isTableMissing('workflow_associations')) {
+                $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "workflow_associations` (
+                    `item_id` int NOT NULL DEFAULT 0,
+                    `stage_id` int NOT NULL,
+                    `extension` varchar(50) NOT NULL,
+                    PRIMARY KEY (`item_id`, `extension`),
+                    KEY `idx_item_id` (`item_id`),
+                    KEY `idx_stage_id` (`stage_id`),
+                    KEY `idx_extension` (`extension`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci";
+
+                $db->setQuery($sql);
+                $db->execute();
+                $totalActions++;
+                $details[] = Text::_('COM_CSQUIRKYDBFIXES_DETAIL_CREATED_ASSOCIATIONS_TABLE');
+            }
+
+            // Step 4: Insert default workflow record
             $query = "INSERT IGNORE INTO " . $db->quoteName('#__workflows') . " "
                 . "(" . $db->quoteName('id') . ", "
                 . $db->quoteName('asset_id') . ", "
@@ -216,12 +296,77 @@ class FixesModel extends BaseDatabaseModel
             $db->setQuery($query);
             $db->execute();
 
-            $affectedRows = $db->getAffectedRows();
+            if ($db->getAffectedRows() > 0) {
+                $totalActions++;
+                $details[] = Text::_('COM_CSQUIRKYDBFIXES_DETAIL_INSERTED_WORKFLOW');
+            }
+
+            // Step 5: Insert default stage record
+            $query = "INSERT IGNORE INTO " . $db->quoteName('#__workflow_stages') . " "
+                . "(" . $db->quoteName('id') . ", "
+                . $db->quoteName('asset_id') . ", "
+                . $db->quoteName('ordering') . ", "
+                . $db->quoteName('workflow_id') . ", "
+                . $db->quoteName('published') . ", "
+                . $db->quoteName('title') . ", "
+                . $db->quoteName('description') . ", "
+                . $db->quoteName('default') . ") "
+                . "VALUES (1, 0, 1, 1, 1, 'COM_WORKFLOW_BASIC_STAGE', '', 1)";
+
+            $db->setQuery($query);
+            $db->execute();
+
+            if ($db->getAffectedRows() > 0) {
+                $totalActions++;
+                $details[] = Text::_('COM_CSQUIRKYDBFIXES_DETAIL_INSERTED_STAGE');
+            }
+
+            // Step 6: Insert default transition records
+            $transitions = [
+                [1, 1, 1, 'UNPUBLISH',           '{"publishing":"0"}'],
+                [2, 2, 1, 'PUBLISH',             '{"publishing":"1"}'],
+                [3, 3, 1, 'TRASH',               '{"publishing":"-2"}'],
+                [4, 4, 1, 'ARCHIVE',             '{"publishing":"2"}'],
+                [5, 5, 1, 'FEATURE',             '{"featuring":"1"}'],
+                [6, 6, 1, 'UNFEATURE',           '{"featuring":"0"}'],
+                [7, 7, 1, 'PUBLISH_AND_FEATURE', '{"publishing":"1","featuring":"1"}'],
+            ];
+
+            $transitionsInserted = 0;
+
+            foreach ($transitions as $t) {
+                $query = "INSERT IGNORE INTO " . $db->quoteName('#__workflow_transitions') . " "
+                    . "(" . $db->quoteName('id') . ", "
+                    . $db->quoteName('asset_id') . ", "
+                    . $db->quoteName('published') . ", "
+                    . $db->quoteName('ordering') . ", "
+                    . $db->quoteName('workflow_id') . ", "
+                    . $db->quoteName('title') . ", "
+                    . $db->quoteName('description') . ", "
+                    . $db->quoteName('from_stage_id') . ", "
+                    . $db->quoteName('to_stage_id') . ", "
+                    . $db->quoteName('options') . ") "
+                    . "VALUES (" . $t[0] . ", 0, 1, " . $t[1] . ", " . $t[2] . ", "
+                    . $db->quote($t[3]) . ", '', -1, 1, " . $db->quote($t[4]) . ")";
+
+                $db->setQuery($query);
+                $db->execute();
+
+                if ($db->getAffectedRows() > 0) {
+                    $transitionsInserted++;
+                }
+            }
+
+            if ($transitionsInserted > 0) {
+                $totalActions += $transitionsInserted;
+                $details[] = Text::sprintf('COM_CSQUIRKYDBFIXES_DETAIL_INSERTED_TRANSITIONS', $transitionsInserted);
+            }
 
             return [
                 'success'       => true,
-                'affected_rows' => $affectedRows,
-                'message'       => Text::sprintf('COM_CSQUIRKYDBFIXES_FIX_MISSING_WORKFLOW_RESULT', $affectedRows),
+                'affected_rows' => $totalActions,
+                'message'       => Text::sprintf('COM_CSQUIRKYDBFIXES_FIX_MISSING_WORKFLOW_RESULT', $totalActions)
+                    . ($totalActions > 0 ? ' (' . implode('; ', $details) . ')' : ''),
             ];
         } catch (\Exception $e) {
             return [
@@ -473,9 +618,73 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
-     * Check if the default workflow record exists
+     * Get the collation used by the existing finder tables
      *
-     * @return  bool  True if the workflow is missing, false if it exists
+     * Detects the collation from the `term` column in `#__finder_terms`,
+     * since that is what the MEMORY tables get JOINed with. Using the
+     * database-level collation (@@collation_database) is unreliable because
+     * shared hosting often defaults to latin1_swedish_ci even when Joomla
+     * tables use utf8mb4_unicode_ci.
+     *
+     * @return  string  The collation (e.g., 'utf8mb4_unicode_ci')
+     *
+     * @since   1.0.0
+     */
+    protected function getFinderCollation(): string
+    {
+        $db = $this->getDatabase();
+        $prefix = $db->getPrefix();
+
+        try {
+            // Get the collation from the term column in finder_terms,
+            // since that's what these MEMORY tables will be JOINed with
+            $sql = "SELECT COLLATION_NAME FROM information_schema.COLUMNS"
+                . " WHERE TABLE_SCHEMA = DATABASE()"
+                . " AND TABLE_NAME = " . $db->quote($prefix . 'finder_terms')
+                . " AND COLUMN_NAME = 'term'";
+
+            $db->setQuery($sql);
+            $collation = $db->loadResult();
+
+            if (!empty($collation)) {
+                return $collation;
+            }
+        } catch (\Exception $e) {
+            // Fall through to default
+        }
+
+        // Joomla 4/5 standard collation
+        return 'utf8mb4_unicode_ci';
+    }
+
+    /**
+     * Check if a database table is missing
+     *
+     * @param   string  $tableName  The table name without prefix (e.g., 'workflow_stages')
+     *
+     * @return  bool  True if the table is missing
+     *
+     * @since   1.0.0
+     */
+    protected function isTableMissing(string $tableName): bool
+    {
+        $db = $this->getDatabase();
+        $fullName = $db->getPrefix() . $tableName;
+
+        $db->setQuery("SHOW TABLES LIKE " . $db->quote($fullName));
+        $result = $db->loadResult();
+
+        return empty($result);
+    }
+
+    /**
+     * Check if the workflow system is incomplete
+     *
+     * Checks all 4 workflow tables: workflows, workflow_stages,
+     * workflow_transitions, and workflow_associations. Returns true if any
+     * table is missing or if the default records are not present.
+     *
+     * @return  bool  True if any part of the workflow system is missing
      *
      * @since   1.0.0
      */
@@ -483,15 +692,57 @@ class FixesModel extends BaseDatabaseModel
     {
         $db = $this->getDatabase();
 
+        // Check if workflow_stages table exists
+        if ($this->isTableMissing('workflow_stages')) {
+            return true;
+        }
+
+        // Check if workflow_transitions table exists
+        if ($this->isTableMissing('workflow_transitions')) {
+            return true;
+        }
+
+        // Check if workflow_associations table exists
+        if ($this->isTableMissing('workflow_associations')) {
+            return true;
+        }
+
+        // Check if default workflow record exists
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__workflows'))
             ->where($db->quoteName('id') . ' = 1')
             ->where($db->quoteName('extension') . ' = ' . $db->quote('com_content.article'));
-
         $db->setQuery($query);
 
-        return (int) $db->loadResult() === 0;
+        if ((int) $db->loadResult() === 0) {
+            return true;
+        }
+
+        // Check if default stage record exists
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__workflow_stages'))
+            ->where($db->quoteName('id') . ' = 1')
+            ->where($db->quoteName('workflow_id') . ' = 1');
+        $db->setQuery($query);
+
+        if ((int) $db->loadResult() === 0) {
+            return true;
+        }
+
+        // Check if default transitions exist (should be 7)
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__workflow_transitions'))
+            ->where($db->quoteName('workflow_id') . ' = 1');
+        $db->setQuery($query);
+
+        if ((int) $db->loadResult() < 7) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -600,6 +851,7 @@ class FixesModel extends BaseDatabaseModel
     {
         $db = $this->getDatabase();
         $prefix = $db->getPrefix();
+        $collation = $this->getFinderCollation();
 
         try {
             $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "finder_tokens` (
@@ -613,7 +865,7 @@ class FixesModel extends BaseDatabaseModel
                 KEY `idx_word` (`term`),
                 KEY `idx_stem` (`stem`),
                 KEY `idx_context` (`context`)
-            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci";
+            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=" . $collation;
 
             $db->setQuery($sql);
             $db->execute();
@@ -643,6 +895,7 @@ class FixesModel extends BaseDatabaseModel
     {
         $db = $this->getDatabase();
         $prefix = $db->getPrefix();
+        $collation = $this->getFinderCollation();
 
         try {
             $sql = "CREATE TABLE IF NOT EXISTS `" . $prefix . "finder_tokens_aggregate` (
@@ -658,7 +911,7 @@ class FixesModel extends BaseDatabaseModel
                 `language` char(7) NOT NULL DEFAULT '',
                 KEY `idx_term` (`term`),
                 KEY `idx_stem` (`stem`)
-            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_general_ci";
+            ) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=" . $collation;
 
             $db->setQuery($sql);
             $db->execute();
@@ -690,7 +943,7 @@ class FixesModel extends BaseDatabaseModel
     {
         // Map fix IDs to their affected tables
         $tableMap = [
-            'missing_workflow'         => ['#__workflows', '#__workflow_stages', '#__workflow_transitions'],
+            'missing_workflow'         => ['#__workflows', '#__workflow_stages', '#__workflow_transitions', '#__workflow_associations'],
             'workflow_associations'     => ['#__workflow_associations'],
             'smart_search_menu'        => ['#__menu'],
             'finder_tokens'            => ['#__finder_tokens'],
@@ -796,159 +1049,6 @@ class FixesModel extends BaseDatabaseModel
     }
 
     /**
-     * Check if workflows are enabled in the com_content component configuration
-     *
-     * After migrating from Joomla 3 to Joomla 4, the workflow_enabled parameter
-     * may not be set in com_content's params. When not set or disabled, Joomla
-     * won't create workflow associations for new articles, but the article list
-     * query still joins to the workflow_associations table - causing new articles
-     * to be invisible in the Article Manager.
-     *
-     * @return  string  'enabled', 'disabled', or 'not_set'
-     *
-     * @since   1.0.0
-     */
-    public function getWorkflowEnabledStatus(): string
-    {
-        $db = $this->getDatabase();
-
-        $query = $db->getQuery(true)
-            ->select($db->quoteName('params'))
-            ->from($db->quoteName('#__extensions'))
-            ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
-            ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
-
-        $db->setQuery($query);
-        $paramsJson = $db->loadResult();
-
-        if (!$paramsJson) {
-            return 'not_set';
-        }
-
-        $params = json_decode($paramsJson, true);
-
-        if (!isset($params['workflow_enabled'])) {
-            return 'not_set';
-        }
-
-        return $params['workflow_enabled'] === '1' ? 'enabled' : 'disabled';
-    }
-
-    /**
-     * Get list of disabled workflow plugins
-     *
-     * If core workflow plugins are disabled, new articles won't get workflow
-     * associations, causing the same "missing associations" problem to recur
-     * after it has been fixed.
-     *
-     * @return  array  Array of disabled plugin names (empty if all are enabled)
-     *
-     * @since   1.0.0
-     */
-    public function getDisabledWorkflowPlugins(): array
-    {
-        $db = $this->getDatabase();
-
-        $query = $db->getQuery(true)
-            ->select([$db->quoteName('name'), $db->quoteName('element')])
-            ->from($db->quoteName('#__extensions'))
-            ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
-            ->where($db->quoteName('folder') . ' = ' . $db->quote('workflow'))
-            ->where($db->quoteName('enabled') . ' = 0');
-
-        $db->setQuery($query);
-        $results = $db->loadAssocList();
-
-        return $results ?: [];
-    }
-
-    /**
-     * Enable workflows in the com_content component configuration
-     *
-     * Sets the workflow_enabled parameter to "1" in com_content's params JSON.
-     *
-     * @return  array  Result array with 'success' and 'message' keys
-     *
-     * @since   1.0.0
-     */
-    public function enableWorkflows(): array
-    {
-        $db = $this->getDatabase();
-
-        try {
-            // Get current params
-            $query = $db->getQuery(true)
-                ->select($db->quoteName('params'))
-                ->from($db->quoteName('#__extensions'))
-                ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
-                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
-
-            $db->setQuery($query);
-            $paramsJson = $db->loadResult();
-
-            $params = $paramsJson ? json_decode($paramsJson, true) : [];
-            $params['workflow_enabled'] = '1';
-
-            $query = $db->getQuery(true)
-                ->update($db->quoteName('#__extensions'))
-                ->set($db->quoteName('params') . ' = ' . $db->quote(json_encode($params)))
-                ->where($db->quoteName('element') . ' = ' . $db->quote('com_content'))
-                ->where($db->quoteName('type') . ' = ' . $db->quote('component'));
-
-            $db->setQuery($query);
-            $db->execute();
-
-            return [
-                'success' => true,
-                'message' => Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_ENABLED_SUCCESS'),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Enable all disabled workflow plugins
-     *
-     * @return  array  Result array with 'success', 'affected_rows', and 'message' keys
-     *
-     * @since   1.0.0
-     */
-    public function enableWorkflowPlugins(): array
-    {
-        $db = $this->getDatabase();
-
-        try {
-            $query = $db->getQuery(true)
-                ->update($db->quoteName('#__extensions'))
-                ->set($db->quoteName('enabled') . ' = 1')
-                ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
-                ->where($db->quoteName('folder') . ' = ' . $db->quote('workflow'))
-                ->where($db->quoteName('enabled') . ' = 0');
-
-            $db->setQuery($query);
-            $db->execute();
-
-            $affectedRows = $db->getAffectedRows();
-
-            return [
-                'success'       => true,
-                'affected_rows' => $affectedRows,
-                'message'       => Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_ENABLED_SUCCESS', $affectedRows),
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success'       => false,
-                'affected_rows' => 0,
-                'message'       => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
      * Get diagnostics for all fixes
      *
      * @return  array  Array of fix IDs to diagnostic info
@@ -963,10 +1063,8 @@ class FixesModel extends BaseDatabaseModel
                 'missing_count' => null,
             ],
             'workflow_associations' => [
-                'is_missing'            => false,
-                'missing_count'         => $this->getMissingWorkflowAssociationsCount(),
-                'disabled_plugins'      => $this->getDisabledWorkflowPlugins(),
-                'workflow_enabled'      => $this->getWorkflowEnabledStatus(),
+                'is_missing'    => false,
+                'missing_count' => $this->getMissingWorkflowAssociationsCount(),
             ],
             'smart_search_menu' => [
                 'is_missing'    => false,

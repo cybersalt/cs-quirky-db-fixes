@@ -2,6 +2,31 @@
     <h1>Changelog - CS Quirky DB Fixes</h1>
 
     <div class="version">
+        <h2>🚀 Version 1.1.0 <span class="version-badge">February 2026</span></h2>
+
+        <h3>📦 New Features</h3>
+        <ul>
+            <li><strong>Fix Missing Smart Search Tokens Table</strong>: Recreates the <code>finder_tokens</code> MEMORY table that is lost when MySQL restarts, causing "Table finder_tokens doesn't exist" errors</li>
+            <li><strong>Fix Missing Smart Search Tokens Aggregate Table</strong>: Recreates the <code>finder_tokens_aggregate</code> MEMORY table that is also lost on MySQL restart</li>
+            <li><strong>Auto-detect collation</strong>: Smart Search table fixes automatically detect the correct collation from existing <code>finder_terms</code> table to prevent collation mismatch errors</li>
+        </ul>
+
+        <h3>🔧 Improvements</h3>
+        <ul>
+            <li><strong>Expanded Workflow System Restore (Fix 1)</strong>: Now checks and creates all 4 workflow tables (<code>workflows</code>, <code>workflow_stages</code>, <code>workflow_transitions</code>, <code>workflow_associations</code>) instead of just inserting a workflow record. Creates missing tables with full schema and inserts all default records (1 workflow, 1 stage, 7 transitions)</li>
+            <li><strong>Full multi-lingual support</strong>: All user-facing strings now use Joomla language constants, including installation script messages, fix detail messages, and post-install UI. Ready for translation</li>
+            <li><strong>Post-install link</strong>: Installation/update success page now shows a clickable button to open the component directly</li>
+            <li><strong>Atum dark mode compatibility</strong>: Fixed button visibility in Atum dark mode template</li>
+        </ul>
+
+        <h3>🐛 Bug Fixes</h3>
+        <ul>
+            <li><strong>Removed incorrect workflow-enabled diagnostic</strong>: Removed the "Enable Workflows" button and diagnostic since <code>workflow_enabled</code> does NOT need to be enabled for articles to save properly</li>
+            <li><strong>Fixed recurring workflow issues</strong>: Root cause identified - the <code>workflow_stages</code> and <code>workflow_transitions</code> tables were completely missing after J3-to-J4 migration, causing new articles to never receive workflow associations even after Fix 2 was applied</li>
+        </ul>
+    </div>
+
+    <div class="version">
         <h2>🚀 Version 1.0.0 <span class="version-badge">February 2026</span></h2>
 
         <h3>📦 Initial Release</h3>

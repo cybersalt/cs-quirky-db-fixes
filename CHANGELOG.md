@@ -1,5 +1,25 @@
 # Changelog
 
+## 🚀 Version 1.1.0 (February 2026)
+
+### 📦 New Features
+
+- **Fix Missing Smart Search Tokens Table**: Recreates the `finder_tokens` MEMORY table that is lost when MySQL restarts, causing "Table finder_tokens doesn't exist" errors
+- **Fix Missing Smart Search Tokens Aggregate Table**: Recreates the `finder_tokens_aggregate` MEMORY table that is also lost on MySQL restart
+- **Auto-detect collation**: Smart Search table fixes automatically detect the correct collation from existing `finder_terms` table to prevent collation mismatch errors
+
+### 🔧 Improvements
+
+- **Expanded Workflow System Restore (Fix 1)**: Now checks and creates all 4 workflow tables (`workflows`, `workflow_stages`, `workflow_transitions`, `workflow_associations`) instead of just inserting a workflow record. Creates missing tables with full schema and inserts all default records (1 workflow, 1 stage, 7 transitions)
+- **Full multi-lingual support**: All user-facing strings now use Joomla language constants, including installation script messages (`script.php`), fix detail messages, and post-install UI. Ready for translation
+- **Post-install link**: Installation/update success page now shows a clickable button to open the component directly
+- **Atum dark mode compatibility**: Fixed button visibility in Atum dark mode template
+
+### 🐛 Bug Fixes
+
+- **Removed incorrect workflow-enabled diagnostic**: Removed the "Enable Workflows" button and diagnostic since `workflow_enabled` does NOT need to be enabled for articles to save properly
+- **Fixed recurring workflow issues**: Root cause identified - the `workflow_stages` and `workflow_transitions` tables were completely missing after J3-to-J4 migration, causing new articles to never receive workflow associations even after Fix 2 was applied
+
 ## 🚀 Version 1.0.0 (February 2026)
 
 ### 📦 Initial Release

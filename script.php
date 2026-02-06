@@ -51,7 +51,7 @@ class Com_CsquirkydbfixesInstallerScript
         // Check PHP version
         if (version_compare(PHP_VERSION, $this->minimumPhp, '<')) {
             Factory::getApplication()->enqueueMessage(
-                sprintf('PHP %s or higher is required. You are running PHP %s.', $this->minimumPhp, PHP_VERSION),
+                Text::sprintf('COM_CSQUIRKYDBFIXES_ERROR_PHP_VERSION', $this->minimumPhp, PHP_VERSION),
                 'error'
             );
             return false;
@@ -60,7 +60,7 @@ class Com_CsquirkydbfixesInstallerScript
         // Check Joomla version
         if (version_compare(JVERSION, $this->minimumJoomla, '<')) {
             Factory::getApplication()->enqueueMessage(
-                sprintf('Joomla %s or higher is required. You are running Joomla %s.', $this->minimumJoomla, JVERSION),
+                Text::sprintf('COM_CSQUIRKYDBFIXES_ERROR_JOOMLA_VERSION', $this->minimumJoomla, JVERSION),
                 'error'
             );
             return false;
@@ -84,7 +84,37 @@ class Com_CsquirkydbfixesInstallerScript
         // Clear autoload cache
         $this->clearAutoloadCache();
 
+        // Show post-install message with link to the component
+        $this->showPostInstallMessage($type);
+
         return true;
+    }
+
+    /**
+     * Display a post-install message with a link to the component
+     *
+     * @param   string  $type  Type of change (install, update, or discover_install)
+     *
+     * @return  void
+     *
+     * @since   1.0.0
+     */
+    protected function showPostInstallMessage(string $type): void
+    {
+        $messageKey = $type === 'update'
+            ? 'COM_CSQUIRKYDBFIXES_POSTINSTALL_UPDATED'
+            : 'COM_CSQUIRKYDBFIXES_POSTINSTALL_INSTALLED';
+        $url = 'index.php?option=com_csquirkydbfixes';
+
+        echo '<div class="card mb-3" style="margin: 20px 0;">'
+            . '<div class="card-body">'
+            . '<h3 class="card-title">' . Text::_('COM_CSQUIRKYDBFIXES') . '</h3>'
+            . '<p class="card-text">' . Text::_($messageKey) . '</p>'
+            . '<a href="' . $url . '" class="btn btn-primary text-white">'
+            . '<span class="icon-wrench" aria-hidden="true"></span> '
+            . Text::_('COM_CSQUIRKYDBFIXES_POSTINSTALL_OPEN')
+            . '</a>'
+            . '</div></div>';
     }
 
     /**
@@ -119,7 +149,7 @@ class Com_CsquirkydbfixesInstallerScript
                 @unlink($cacheFile);
             } catch (\Exception $e) {
                 Factory::getApplication()->enqueueMessage(
-                    'Please manually delete administrator/cache/autoload_psr4.php',
+                    Text::_('COM_CSQUIRKYDBFIXES_ERROR_DELETE_CACHE'),
                     'warning'
                 );
             }
