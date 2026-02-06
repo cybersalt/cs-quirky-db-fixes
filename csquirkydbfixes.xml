@@ -29,6 +29,34 @@
         <languages folder="admin/language">
             <language tag="en-GB">en-GB/com_csquirkydbfixes.ini</language>
             <language tag="en-GB">en-GB/com_csquirkydbfixes.sys.ini</language>
+            <language tag="nl-NL">nl-NL/com_csquirkydbfixes.ini</language>
+            <language tag="nl-NL">nl-NL/com_csquirkydbfixes.sys.ini</language>
+            <language tag="de-DE">de-DE/com_csquirkydbfixes.ini</language>
+            <language tag="de-DE">de-DE/com_csquirkydbfixes.sys.ini</language>
+            <language tag="es-ES">es-ES/com_csquirkydbfixes.ini</language>
+            <language tag="es-ES">es-ES/com_csquirkydbfixes.sys.ini</language>
+            <language tag="fr-FR">fr-FR/com_csquirkydbfixes.ini</language>
+            <language tag="fr-FR">fr-FR/com_csquirkydbfixes.sys.ini</language>
+            <language tag="it-IT">it-IT/com_csquirkydbfixes.ini</language>
+            <language tag="it-IT">it-IT/com_csquirkydbfixes.sys.ini</language>
+            <language tag="pt-BR">pt-BR/com_csquirkydbfixes.ini</language>
+            <language tag="pt-BR">pt-BR/com_csquirkydbfixes.sys.ini</language>
+            <language tag="ru-RU">ru-RU/com_csquirkydbfixes.ini</language>
+            <language tag="ru-RU">ru-RU/com_csquirkydbfixes.sys.ini</language>
+            <language tag="pl-PL">pl-PL/com_csquirkydbfixes.ini</language>
+            <language tag="pl-PL">pl-PL/com_csquirkydbfixes.sys.ini</language>
+            <language tag="ja-JP">ja-JP/com_csquirkydbfixes.ini</language>
+            <language tag="ja-JP">ja-JP/com_csquirkydbfixes.sys.ini</language>
+            <language tag="zh-CN">zh-CN/com_csquirkydbfixes.ini</language>
+            <language tag="zh-CN">zh-CN/com_csquirkydbfixes.sys.ini</language>
+            <language tag="tr-TR">tr-TR/com_csquirkydbfixes.ini</language>
+            <language tag="tr-TR">tr-TR/com_csquirkydbfixes.sys.ini</language>
+            <language tag="el-GR">el-GR/com_csquirkydbfixes.ini</language>
+            <language tag="el-GR">el-GR/com_csquirkydbfixes.sys.ini</language>
+            <language tag="cs-CZ">cs-CZ/com_csquirkydbfixes.ini</language>
+            <language tag="cs-CZ">cs-CZ/com_csquirkydbfixes.sys.ini</language>
+            <language tag="sv-SE">sv-SE/com_csquirkydbfixes.ini</language>
+            <language tag="sv-SE">sv-SE/com_csquirkydbfixes.sys.ini</language>
         </languages>
     </administration>
 </extension>

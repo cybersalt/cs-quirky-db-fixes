@@ -11,7 +11,8 @@
 ### 🔧 Improvements
 
 - **Expanded Workflow System Restore (Fix 1)**: Now checks and creates all 4 workflow tables (`workflows`, `workflow_stages`, `workflow_transitions`, `workflow_associations`) instead of just inserting a workflow record. Creates missing tables with full schema and inserts all default records (1 workflow, 1 stage, 7 transitions)
-- **Full multi-lingual support**: All user-facing strings now use Joomla language constants, including installation script messages (`script.php`), fix detail messages, and post-install UI. Ready for translation
+- **Full multi-lingual support**: All user-facing strings now use Joomla language constants, including installation script messages (`script.php`), fix detail messages, and post-install UI
+- **15 language translations**: Includes translations for English, Dutch, German, Spanish, French, Italian, Portuguese (Brazil), Russian, Polish, Japanese, Chinese (Simplified), Turkish, Greek, Czech, and Swedish
 - **Post-install link**: Installation/update success page now shows a clickable button to open the component directly
 - **Atum dark mode compatibility**: Fixed button visibility in Atum dark mode template
 
