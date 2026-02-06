@@ -129,7 +129,7 @@ use Joomla\CMS\Router\Route;
                                         <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post">
                                             <input type="hidden" name="task" value="fixes.enableworkflows">
                                             <?php echo HTMLHelper::_('form.token'); ?>
-                                            <button type="submit" class="btn btn-light border border-danger">
+                                            <button type="submit" class="btn btn-warning">
                                                 <span class="icon-play" aria-hidden="true"></span>
                                                 <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_FIX_BUTTON'); ?>
                                             </button>
@@ -150,7 +150,7 @@ use Joomla\CMS\Router\Route;
                                         <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post">
                                             <input type="hidden" name="task" value="fixes.enableworkflowplugins">
                                             <?php echo HTMLHelper::_('form.token'); ?>
-                                            <button type="submit" class="btn btn-light border border-danger">
+                                            <button type="submit" class="btn btn-warning">
                                                 <span class="icon-play" aria-hidden="true"></span>
                                                 <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_ENABLE_BUTTON'); ?>
                                             </button>
