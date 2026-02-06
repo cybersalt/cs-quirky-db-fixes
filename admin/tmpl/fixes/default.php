@@ -120,16 +120,16 @@ use Joomla\CMS\Router\Route;
                                 $workflowEnabled = $diagnostic['workflow_enabled'] ?? 'enabled';
                                 if ($workflowEnabled !== 'enabled') :
                                 ?>
-                                    <div class="alert alert-danger">
-                                        <h6 class="alert-heading">
+                                    <div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div>
                                             <span class="icon-notification-circle" aria-hidden="true"></span>
-                                            <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_HEADING'); ?>
-                                        </h6>
-                                        <p class="mb-2"><?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED'); ?></p>
-                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline">
+                                            <strong><?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_HEADING'); ?></strong>
+                                            — <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED'); ?>
+                                        </div>
+                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline flex-shrink-0">
                                             <input type="hidden" name="task" value="fixes.enableworkflows">
                                             <?php echo HTMLHelper::_('form.token'); ?>
-                                            <button type="submit" class="btn btn-sm btn-danger">
+                                            <button type="submit" class="btn btn-danger">
                                                 <span class="icon-play" aria-hidden="true"></span>
                                                 <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_NOT_ENABLED_FIX_BUTTON'); ?>
                                             </button>
@@ -141,16 +141,16 @@ use Joomla\CMS\Router\Route;
                                 if (!empty($disabledPlugins)) :
                                     $pluginNames = array_map(function ($p) { return Text::_($p['name']); }, $disabledPlugins);
                                 ?>
-                                    <div class="alert alert-danger">
-                                        <h6 class="alert-heading">
+                                    <div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div>
                                             <span class="icon-notification-circle" aria-hidden="true"></span>
-                                            <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED_HEADING'); ?>
-                                        </h6>
-                                        <p class="mb-2"><?php echo Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED', implode(', ', $pluginNames)); ?></p>
-                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline">
+                                            <strong><?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED_HEADING'); ?></strong>
+                                            — <?php echo Text::sprintf('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_DISABLED', implode(', ', $pluginNames)); ?>
+                                        </div>
+                                        <form action="<?php echo Route::_('index.php?option=com_csquirkydbfixes'); ?>" method="post" class="d-inline flex-shrink-0">
                                             <input type="hidden" name="task" value="fixes.enableworkflowplugins">
                                             <?php echo HTMLHelper::_('form.token'); ?>
-                                            <button type="submit" class="btn btn-sm btn-danger">
+                                            <button type="submit" class="btn btn-danger">
                                                 <span class="icon-play" aria-hidden="true"></span>
                                                 <?php echo Text::_('COM_CSQUIRKYDBFIXES_WORKFLOW_PLUGINS_ENABLE_BUTTON'); ?>
                                             </button>
