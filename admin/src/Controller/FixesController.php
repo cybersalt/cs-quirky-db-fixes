@@ -38,6 +38,15 @@ class FixesController extends BaseController
         Session::checkToken() or die(Text::_('JINVALID_TOKEN'));
 
         $app = Factory::getApplication();
+
+        // Check for Super User access
+        if (!$app->getIdentity()->authorise('core.admin')) {
+            $app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+            $this->setRedirect(Route::_('index.php', false));
+
+            return;
+        }
+
         $fixId = $app->input->getString('fix_id', '');
 
         if (empty($fixId)) {
@@ -86,6 +95,15 @@ class FixesController extends BaseController
         Session::checkToken() or die(Text::_('JINVALID_TOKEN'));
 
         $app = Factory::getApplication();
+
+        // Check for Super User access
+        if (!$app->getIdentity()->authorise('core.admin')) {
+            $app->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
+            $this->setRedirect(Route::_('index.php', false));
+
+            return;
+        }
+
         $fixId = $app->input->getString('fix_id', '');
 
         if (empty($fixId)) {
