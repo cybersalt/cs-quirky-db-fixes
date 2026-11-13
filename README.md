@@ -47,6 +47,12 @@ The same installation ZIP installs on Joomla 4.2+, Joomla 5, and Joomla 6. Insta
 3. Upload and install the ZIP file
 4. Access via Components > CS Quirky DB Fixes
 
+## Permissions
+
+Only Super Users can open the component, run fixes or download backups. Other administrators don't see it in the Components menu, and a direct link gives them a "not authorised" error.
+
+On install, and on update for sites that never set permissions for the component, Public is denied *Configure* and *Access Administration Interface* on the component. Every user group inherits that, so only Super Users get through. Permissions that were already set are left alone.
+
 ## Usage
 
 1. Review each fix and its diagnostic status

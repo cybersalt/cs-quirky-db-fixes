@@ -12,6 +12,7 @@
 use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\InstallerAdapter;
 use Joomla\CMS\Language\Text;
+use Joomla\Database\DatabaseInterface;
 
 /**
  * Component installer script
@@ -84,10 +85,8 @@ class Com_CsquirkydbfixesInstallerScript
         // Clear autoload cache
         $this->clearAutoloadCache();
 
-        // On fresh install, set permissions to Super Users only
-        if ($type === 'install') {
-            $this->setDefaultPermissions();
-        }
+        // Restrict to Super Users on install, and on update for sites that never set permissions
+        $this->setDefaultPermissions();
 
         // Show post-install message with link to the component
         $this->showPostInstallMessage($type);
@@ -125,35 +124,55 @@ class Com_CsquirkydbfixesInstallerScript
     /**
      * Set default component permissions to Super Users only
      *
+     * Denies core.admin and core.manage to the root user group (Public), which
+     * every other group inherits from. Super Users pass every permission check,
+     * so they keep access while the component and its menu item are hidden from
+     * everyone else. Rules that have already been set are left alone.
+     *
      * @return  void
      *
-     * @since   1.0.0
+     * @since   1.2.0
      */
     protected function setDefaultPermissions(): void
     {
         try {
-            $db = Factory::getDbo();
+            $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-            // Get the component's asset_id
+            // Get the component's asset
             $query = $db->getQuery(true)
-                ->select($db->quoteName('id'))
+                ->select($db->quoteName(['id', 'rules']))
                 ->from($db->quoteName('#__assets'))
                 ->where($db->quoteName('name') . ' = ' . $db->quote('com_csquirkydbfixes'));
 
             $db->setQuery($query);
-            $assetId = (int) $db->loadResult();
+            $asset = $db->loadObject();
 
-            if (!$assetId) {
+            if (!$asset || !empty(json_decode((string) $asset->rules, true))) {
                 return;
             }
 
-            // Set rules: deny all by default, allow Super Users (group 8) for core.admin and core.manage
-            $rules = '{"core.admin":{"8":1},"core.manage":{"8":1}}';
+            // Get the root user group (Public)
+            $query = $db->getQuery(true)
+                ->select($db->quoteName('id'))
+                ->from($db->quoteName('#__usergroups'))
+                ->where($db->quoteName('parent_id') . ' = 0');
+
+            $db->setQuery($query);
+            $rootGroupId = (int) $db->loadResult();
+
+            if (!$rootGroupId) {
+                return;
+            }
+
+            $rules = json_encode([
+                'core.admin'  => [$rootGroupId => 0],
+                'core.manage' => [$rootGroupId => 0],
+            ]);
 
             $query = $db->getQuery(true)
                 ->update($db->quoteName('#__assets'))
                 ->set($db->quoteName('rules') . ' = ' . $db->quote($rules))
-                ->where($db->quoteName('id') . ' = ' . $assetId);
+                ->where($db->quoteName('id') . ' = ' . (int) $asset->id);
 
             $db->setQuery($query);
             $db->execute();

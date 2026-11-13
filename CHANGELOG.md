@@ -1,5 +1,21 @@
 # Changelog
 
+## 🚀 Version 1.2.0 (November 2026)
+
+### 🔒 Security
+
+- **Super Users only**: The component now only opens for Super Users. Before, any administrator who could manage components could run the database fixes and download table backups. Thanks to [Phil Taylor](https://github.com/PhilETaylor) for the pull request (#1)
+- **Checked on every request**: The Super User check runs in the component's dispatcher, so it covers every view and task, with extra checks in the view and in the Run Fix and Download Backup actions
+- **Menu item hidden for everyone else**: On install, and on update for sites that never set permissions for the component, Public is denied Configure and Access Administration Interface. Every user group inherits that, so only Super Users see Components > CS Quirky DB Fixes. Permissions you have already set are left alone
+
+### 📦 New Features
+
+- **Joomla 4.2+ support**: The same ZIP now installs on Joomla 4.2 and later, so you can repair the workflow and Smart Search tables on a Joomla 4 site before upgrading it to Joomla 5
+
+### 🐛 Bug Fixes
+
+- **Joomla changelog**: The changelog link in the manifest now points to a Joomla changelog XML file, so System > Manage > Extensions > Changelog works
+
 ## 🚀 Version 1.1.0 (February 2026)
 
 ### 📦 New Features

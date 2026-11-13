@@ -2,14 +2,14 @@
 <extension type="component" version="4.0" method="upgrade">
     <name>COM_CSQUIRKYDBFIXES</name>
     <author>Cybersalt</author>
-    <creationDate>2026-02</creationDate>
+    <creationDate>2026-11</creationDate>
     <copyright>Copyright (C) 2026 Cybersalt Consulting Ltd. All rights reserved.</copyright>
     <license>GNU General Public License version 2 or later</license>
     <authorEmail>support@cybersalt.com</authorEmail>
     <authorUrl>https://cybersalt.com</authorUrl>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <description>COM_CSQUIRKYDBFIXES_XML_DESCRIPTION</description>
-    <changelogurl>https://raw.githubusercontent.com/cybersalt/cs-quirky-db-fixes/main/CHANGELOG.html</changelogurl>
+    <changelogurl>https://raw.githubusercontent.com/cybersalt/cs-quirky-db-fixes/main/changelog.xml</changelogurl>
 
     <namespace path="src">Cybersalt\Component\CsQuirkyDbFixes</namespace>
 

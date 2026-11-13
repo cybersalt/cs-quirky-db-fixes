@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<changelogs>
+    <changelog>
+        <element>com_csquirkydbfixes</element>
+        <type>component</type>
+        <version>1.2.0</version>
+        <security>
+            <item>The component now only opens for Super Users. Before, any administrator who could manage components could run the database fixes and download table backups. Thanks to Phil Taylor for the pull request (#1).</item>
+            <item>The Super User check runs in the component's dispatcher, so it covers every view and task.</item>
+            <item>On install, and on update for sites that never set permissions for the component, the menu item is hidden from everyone except Super Users. Permissions you have already set are left alone.</item>
+        </security>
+        <addition>
+            <item>Installs on Joomla 4.2 and later, so you can repair the workflow and Smart Search tables on a Joomla 4 site before upgrading it to Joomla 5.</item>
+        </addition>
+        <fix>
+            <item>The manifest's changelog link now points to this Joomla changelog file.</item>
+        </fix>
+    </changelog>
+    <changelog>
+        <element>com_csquirkydbfixes</element>
+        <type>component</type>
+        <version>1.1.0</version>
+        <addition>
+            <item>Fix Missing Smart Search Tokens Table: recreates the finder_tokens MEMORY table lost on a MySQL restart.</item>
+            <item>Fix Missing Smart Search Tokens Aggregate Table: recreates the finder_tokens_aggregate MEMORY table lost on a MySQL restart.</item>
+            <item>The Smart Search table fixes detect the collation from the existing finder_terms table.</item>
+        </addition>
+        <change>
+            <item>Fix 1 now checks and creates all four workflow tables and inserts the default workflow, stage and seven transitions.</item>
+            <item>All user-facing strings use language constants.</item>
+            <item>Post-install button to open the component.</item>
+        </change>
+        <language>
+            <item>15 languages: en-GB, nl-NL, de-DE, es-ES, fr-FR, it-IT, pt-BR, ru-RU, pl-PL, ja-JP, zh-CN, tr-TR, el-GR, cs-CZ, sv-SE.</item>
+        </language>
+        <fix>
+            <item>Removed the incorrect "Enable Workflows" diagnostic.</item>
+            <item>Button visibility in Atum dark mode.</item>
+        </fix>
+    </changelog>
+    <changelog>
+        <element>com_csquirkydbfixes</element>
+        <type>component</type>
+        <version>1.0.0</version>
+        <addition>
+            <item>Fix Missing Default Workflow, Fix Missing Workflow Associations and Fix Missing Smart Search Menu Items, each with a diagnostic, a SQL backup download and a confirmation checkbox.</item>
+        </addition>
+    </changelog>
+</changelogs>
