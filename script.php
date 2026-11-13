@@ -26,7 +26,7 @@ class Com_CsquirkydbfixesInstallerScript
      * @var    string
      * @since  1.0.0
      */
-    protected $minimumJoomla = '5.0.0';
+    protected $minimumJoomla = '4.2.0';
 
     /**
      * Minimum PHP version required

@@ -1,6 +1,8 @@
 # CS Quirky DB Fixes
 
-A Joomla 5/6 component that provides fixes for quirky database problems that occur from time to time, particularly after migrations from Joomla 3 to Joomla 4.
+A Joomla 4/5/6 component that provides fixes for quirky database problems that occur from time to time, particularly after migrations from Joomla 3 to Joomla 4.
+
+The same installation ZIP installs on Joomla 4.2+, Joomla 5, and Joomla 6. Install it on a stuck Joomla 4 site to repair the workflow and Smart Search tables that block a clean upgrade to Joomla 5.
 
 ## Features
 
@@ -55,8 +57,10 @@ A Joomla 5/6 component that provides fixes for quirky database problems that occ
 
 ## Requirements
 
-- Joomla 5.0+ or Joomla 6.0+
+- Joomla 4.2+, 5.0+, or 6.0+
 - PHP 8.1+
+
+> **Why Joomla 4.2 as the floor?** The component calls `BaseDatabaseModel::getDatabase()`, which was added in Joomla 4.2. On 4.0/4.1 you would hit a fatal error when running a fix.
 
 ## License
 
