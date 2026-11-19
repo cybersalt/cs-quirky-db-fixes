@@ -3,6 +3,14 @@
     <changelog>
         <element>com_csquirkydbfixes</element>
         <type>component</type>
+        <version>1.2.1</version>
+        <change>
+            <item>Updates and the changelog now come from cybersalt.com, so new versions show up under System &gt; Update &gt; Extensions. Sites on 1.2.0 or older install this version by hand once.</item>
+        </change>
+    </changelog>
+    <changelog>
+        <element>com_csquirkydbfixes</element>
+        <type>component</type>
         <version>1.2.0</version>
         <security>
             <item>The component now only opens for Super Users, including running the fixes and downloading table backups. Thanks to Phil Taylor for the pull request (#1).</item>

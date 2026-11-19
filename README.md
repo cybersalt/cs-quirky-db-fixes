@@ -1,5 +1,7 @@
 # CS Quirky DB Fixes
 
+<img src="https://www.cybersalt.com/images/extensions/logos/cs-quirky-db-fixes.svg" alt="CS Quirky DB Fixes logo" width="120" height="120" align="right" />
+
 A Joomla 4/5/6 component that provides fixes for quirky database problems that occur from time to time, particularly after migrations from Joomla 3 to Joomla 4.
 
 The same installation ZIP installs on Joomla 4.2+, Joomla 5, and Joomla 6. Install it on a stuck Joomla 4 site to repair the workflow and Smart Search tables that block a clean upgrade to Joomla 5.

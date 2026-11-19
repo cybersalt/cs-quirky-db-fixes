@@ -1,11 +1,12 @@
 # Changelog
 
-## Unreleased
+## 🚀 Version 1.2.1 (November 2026)
 
 ### 🔧 Improvements
 
 - **Updates through Joomla**: The component now gets its updates and changelog from cybersalt.com, so new versions show up under System > Update > Extensions. 1.2.0 had no update server, so sites on 1.2.0 or older need to install this version by hand once.
 - **Download from cybersalt.com**: The README now points to the download on cybersalt.com.
+- **Logo**: a database with a wrench badge, shown in the README and on cybersalt.com.
 
 ### 📝 Documentation
 

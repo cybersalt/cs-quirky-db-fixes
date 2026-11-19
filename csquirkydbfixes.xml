@@ -7,7 +7,7 @@
     <license>GNU General Public License version 2 or later</license>
     <authorEmail>support@cybersalt.com</authorEmail>
     <authorUrl>https://cybersalt.com</authorUrl>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <description>COM_CSQUIRKYDBFIXES_XML_DESCRIPTION</description>
     <changelogurl>https://www.cybersalt.com/index.php?option=com_csreleasemanager&amp;task=api.changelogxml&amp;format=raw&amp;element=com_csquirkydbfixes</changelogurl>
 
