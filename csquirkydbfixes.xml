@@ -9,7 +9,7 @@
     <authorUrl>https://cybersalt.com</authorUrl>
     <version>1.2.0</version>
     <description>COM_CSQUIRKYDBFIXES_XML_DESCRIPTION</description>
-    <changelogurl>https://raw.githubusercontent.com/cybersalt/cs-quirky-db-fixes/main/changelog.xml</changelogurl>
+    <changelogurl>https://www.cybersalt.com/index.php?option=com_csreleasemanager&amp;task=api.changelogxml&amp;format=raw&amp;element=com_csquirkydbfixes</changelogurl>
 
     <namespace path="src">Cybersalt\Component\CsQuirkyDbFixes</namespace>
 
@@ -60,4 +60,8 @@
             <language tag="sv-SE">sv-SE/com_csquirkydbfixes.sys.ini</language>
         </languages>
     </administration>
+
+    <updateservers>
+        <server type="extension" priority="1" name="Cybersalt Quirky DB Fixes Updates">https://www.cybersalt.com/index.php?option=com_csreleasemanager&amp;task=api.updatexml&amp;format=raw&amp;element=com_csquirkydbfixes</server>
+    </updateservers>
 </extension>

@@ -42,7 +42,7 @@ The same installation ZIP installs on Joomla 4.2+, Joomla 5, and Joomla 6. Insta
 
 ## Installation
 
-1. Download the latest release ZIP file
+1. Download the latest release ZIP from [cybersalt.com/extensions/quirky-db-fixes](https://www.cybersalt.com/extensions/quirky-db-fixes)
 2. In Joomla Administrator, go to System > Install > Extensions
 3. Upload and install the ZIP file
 4. Access via Components > CS Quirky DB Fixes

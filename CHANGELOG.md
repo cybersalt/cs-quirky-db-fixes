@@ -1,10 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### 🔧 Improvements
+
+- **Updates through Joomla**: The component now gets its updates and changelog from cybersalt.com, so new versions show up under System > Update > Extensions. 1.2.0 had no update server, so sites on 1.2.0 or older need to install this version by hand once.
+- **Download from cybersalt.com**: The README now points to the download on cybersalt.com.
+
+### 📝 Documentation
+
+- The 1.2.0 notes below now say what was changed without describing how older versions could be misused.
+
 ## 🚀 Version 1.2.0 (November 2026)
 
 ### 🔒 Security
 
-- **Super Users only**: The component now only opens for Super Users. Before, any administrator who could manage components could run the database fixes and download table backups. Thanks to [Phil Taylor](https://github.com/PhilETaylor) for the pull request (#1)
+- **Super Users only**: The component now only opens for Super Users, including running the fixes and downloading table backups. Thanks to [Phil Taylor](https://github.com/PhilETaylor) for the pull request (#1)
 - **Checked on every request**: The Super User check runs in the component's dispatcher, so it covers every view and task, with extra checks in the view and in the Run Fix and Download Backup actions
 - **Menu item hidden for everyone else**: On install, and on update for sites that never set permissions for the component, Public is denied Configure and Access Administration Interface. Every user group inherits that, so only Super Users see Components > CS Quirky DB Fixes. Permissions you have already set are left alone
 

@@ -2,11 +2,20 @@
     <h1>Changelog - CS Quirky DB Fixes</h1>
 
     <div class="version">
+        <h2>Unreleased</h2>
+
+        <h3>🔧 Improvements</h3>
+        <ul>
+            <li><strong>Updates through Joomla</strong>: The component now gets its updates and changelog from cybersalt.com, so new versions show up under System &gt; Update &gt; Extensions. 1.2.0 had no update server, so sites on 1.2.0 or older need to install this version by hand once.</li>
+        </ul>
+    </div>
+
+    <div class="version">
         <h2>🚀 Version 1.2.0 <span class="version-badge">November 2026</span></h2>
 
         <h3>🔒 Security</h3>
         <ul>
-            <li><strong>Super Users only</strong>: The component now only opens for Super Users. Before, any administrator who could manage components could run the database fixes and download table backups. Thanks to <a href="https://github.com/PhilETaylor" target="_blank" rel="noopener noreferrer">Phil Taylor</a> for the pull request (#1)</li>
+            <li><strong>Super Users only</strong>: The component now only opens for Super Users, including running the fixes and downloading table backups. Thanks to <a href="https://github.com/PhilETaylor" target="_blank" rel="noopener noreferrer">Phil Taylor</a> for the pull request (#1)</li>
             <li><strong>Checked on every request</strong>: The Super User check runs in the component's dispatcher, so it covers every view and task, with extra checks in the view and in the Run Fix and Download Backup actions</li>
             <li><strong>Menu item hidden for everyone else</strong>: On install, and on update for sites that never set permissions for the component, Public is denied Configure and Access Administration Interface. Every user group inherits that, so only Super Users see Components &gt; CS Quirky DB Fixes. Permissions you have already set are left alone</li>
         </ul>
